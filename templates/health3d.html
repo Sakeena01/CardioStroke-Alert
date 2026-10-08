@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>3D Health Dashboard</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static',filename='css/health3d.css') }}">
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+
+<script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+
+</head>
+
+<body>
+
+<div id="viewer"></div>
+
+<div class="panel">
+
+<h2>AI Health Status</h2>
+
+<p>❤️ Heart : Healthy</p>
+
+<p>🧠 Brain : Normal</p>
+
+<p>🫁 Oxygen : 98%</p>
+
+<p>⚠ Risk : Low</p>
+
+</div>
+
+<script src="{{ url_for('static',filename='js/health3d.js') }}"></script>
+
+</body>
+
+</html>

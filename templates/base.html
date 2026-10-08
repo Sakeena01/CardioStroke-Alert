@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}CardioStroke AI{% endblock %}
+    </title>
+
+
+    <!-- ================= MAIN CSS ================= -->
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/base.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+    {% block css %}{% endblock %}
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="sidebar">
+
+    <!-- BRAND -->
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            ❤️
+        </div>
+
+        <div class="brand-text">
+            <h2>CardioStroke</h2>
+            <span>AI</span>
+        </div>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ url_for('dashboard.dashboard') }}">
+            🏠
+            <span>Dashboard</span>
+        </a>
+
+
+        <a href="{{ url_for('analytics.analytics') }}">
+            📊
+            <span>Analytics</span>
+        </a>
+
+
+        <a href="{{ url_for('prediction.prediction') }}">
+            🩺
+            <span>Prediction</span>
+        </a>
+
+
+        <a href="{{ url_for('history.history') }}">
+            🕘
+            <span>History</span>
+        </a>
+
+
+        <a href="{{ url_for('report.download_report') }}">
+    📄 Report
+</a>
+
+
+    </nav>
+
+
+    <!-- SYSTEM STATUS -->
+
+    <div class="system-status">
+
+        <div class="status-dot"></div>
+
+        <div class="status-text">
+
+            <strong>System Online</strong>
+
+            <small>
+                AI monitoring active
+            </small>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="main-content">
+
+    {% block content %}
+
+    {% endblock %}
+
+</main>
+
+
+
+<!-- =====================================================
+     CHART.JS
+===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<!-- =====================================================
+     PAGE SPECIFIC JAVASCRIPT
+===================================================== -->
+
+{% block scripts %}
+
+{% endblock %}
+
+
+</body>
+
+</html>

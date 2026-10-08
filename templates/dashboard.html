@@ -1,0 +1,4619 @@
+{% extends "base.html" %}
+
+{% block title %}AI Health Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.dashboard-page {
+    padding: 25px;
+    max-width: 1500px;
+    margin: auto;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding: 25px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+}
+
+.dashboard-title h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.dashboard-title p {
+    margin: 8px 0 0;
+    color: #aeb8c7;
+    font-size: 14px;
+}
+
+.system-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: rgba(34,197,94,0.12);
+    color: #4ade80;
+    font-size: 13px;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 10px #22c55e;
+}
+
+.sync-info {
+    text-align: right;
+}
+
+.sync-info strong {
+    display: block;
+    font-size: 15px;
+}
+
+.sync-info span {
+    display: block;
+    margin-top: 5px;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   DEVICE BAR
+========================================================= */
+
+.device-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+.device-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.device-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: rgba(59,130,246,0.15);
+    font-size: 22px;
+}
+
+.device-name {
+    font-weight: 600;
+}
+
+.device-source {
+    margin-top: 4px;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.live-badge {
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: rgba(34,197,94,0.12);
+    color: #4ade80;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   HEALTH CARDS
+========================================================= */
+
+.health-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.health-card {
+    min-height: 160px;
+    padding: 22px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+}
+
+.health-card:hover {
+    transform: translateY(-3px);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-label {
+    color: #aeb8c7;
+    font-size: 14px;
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.07);
+    font-size: 20px;
+}
+
+.card-value {
+    margin-top: 18px;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.card-unit {
+    margin-left: 5px;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.card-status {
+    margin-top: 10px;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MAIN GRID
+========================================================= */
+
+.main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.panel {
+    padding: 22px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.panel-header span {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+.chart-container {
+    width: 100%;
+    height: 350px;
+}
+
+#healthChart {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* =========================================================
+   HEALTH SCORE
+========================================================= */
+
+.score-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.score-circle {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            #22c55e var(--score),
+            rgba(255,255,255,0.08) var(--score)
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    margin: auto;
+
+    --score: 0%;
+}
+
+.score-circle::after {
+    content: "";
+    position: absolute;
+    width: 175px;
+    height: 175px;
+    border-radius: 50%;
+    background: #111827;
+}
+
+.score-number {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.score-number strong {
+    display: block;
+    font-size: 48px;
+}
+
+.score-number span {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.score-title {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.score-description {
+    max-width: 300px;
+    margin-top: 8px;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   RISK PANEL
+========================================================= */
+
+.risk-panel {
+    margin-bottom: 25px;
+}
+
+.risk-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.risk-box {
+    padding: 22px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+}
+
+.risk-label {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.risk-value {
+    margin-top: 8px;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+.low-risk {
+    color: #4ade80;
+}
+
+.moderate-risk {
+    color: #facc15;
+}
+
+.high-risk {
+    color: #f87171;
+}
+
+.stroke-probability {
+    margin-top: 12px;
+}
+
+.ai-progress {
+    height: 9px;
+    overflow: hidden;
+    margin-top: 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+}
+
+.ai-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    background: #f87171;
+    transition: width 0.5s ease;
+}
+
+
+/* =========================================================
+   RECOMMENDATIONS
+========================================================= */
+
+.recommendations {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.recommendation {
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+}
+
+.recommendation-icon {
+    font-size: 25px;
+}
+
+.recommendation h3 {
+    margin: 12px 0 6px;
+    font-size: 15px;
+}
+
+.recommendation p {
+    margin: 0;
+    color: #9ca3af;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+.history-table-wrapper {
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+    padding: 13px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.history-table th {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.history-table td {
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    padding: 40px;
+    text-align: center;
+    color: #9ca3af;
+}
+
+
+/* =========================================================
+   30 DAY MONITORING
+========================================================= */
+
+.monitoring-section {
+    margin-top: 30px;
+    margin-bottom: 25px;
+    padding: 25px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.monitoring-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.monitoring-section .section-header h2 {
+    margin: 0;
+    font-size: 23px;
+}
+
+.monitoring-section .section-header p {
+    margin: 7px 0 0;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.observation-status {
+    padding: 9px 15px;
+    border-radius: 20px;
+    background: rgba(59,130,246,0.12);
+    color: #60a5fa;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   MONITORING CARDS
+========================================================= */
+
+.monitoring-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.monitor-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 105px;
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.2s ease;
+}
+
+.monitor-card:hover {
+    transform: translateY(-3px);
+}
+
+.monitor-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+    background: rgba(255,255,255,0.07);
+
+    font-size: 22px;
+}
+
+.monitor-content {
+    min-width: 0;
+}
+
+.monitor-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.monitor-content h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.monitor-content p {
+    margin: 5px 0 0;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   OBSERVATION PROGRESS
+========================================================= */
+
+.observation-progress {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.035);
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #d1d5db;
+    font-size: 13px;
+}
+
+.progress-header strong {
+    color: #ffffff;
+}
+
+.observation-progress-bar {
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+}
+
+.observation-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 20px;
+    background: #2563eb;
+    transition: width 0.5s ease;
+}
+
+
+/* =========================================================
+   AVERAGES
+========================================================= */
+
+.average-section {
+    margin-top: 30px;
+}
+
+.average-section h3,
+.comparison-section h3 {
+    margin: 0 0 18px;
+    font-size: 17px;
+}
+
+.average-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.average-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 18px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.04);
+}
+
+.average-icon {
+    font-size: 22px;
+}
+
+.average-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.average-card strong {
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   COMPARISON
+========================================================= */
+
+.comparison-section {
+    margin-top: 30px;
+}
+
+.comparison-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.comparison-box {
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.04);
+}
+
+.comparison-box span {
+    display: block;
+    margin-bottom: 8px;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.comparison-box strong {
+    display: block;
+    font-size: 20px;
+}
+
+.comparison-box small {
+    display: block;
+    margin-top: 7px;
+    color: #9ca3af;
+}
+
+.comparison-arrow {
+    font-size: 25px;
+    color: #9ca3af;
+}
+
+
+/* =========================================================
+   TREND MESSAGES
+========================================================= */
+
+.trend-warning,
+.trend-success,
+.trend-stable,
+.trend-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 14px;
+}
+
+.trend-warning {
+    background: rgba(248,113,113,0.10);
+    border: 1px solid rgba(248,113,113,0.20);
+}
+
+.trend-success {
+    background: rgba(74,222,128,0.10);
+    border: 1px solid rgba(74,222,128,0.20);
+}
+
+.trend-stable {
+    background: rgba(96,165,250,0.10);
+    border: 1px solid rgba(96,165,250,0.20);
+}
+
+.trend-info {
+    background: rgba(156,163,175,0.08);
+    border: 1px solid rgba(156,163,175,0.15);
+}
+
+.trend-warning p,
+.trend-success p,
+.trend-stable p,
+.trend-info p {
+    margin: 4px 0 0;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .health-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .recommendations {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .monitoring-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .average-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .risk-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .dashboard-page {
+        padding: 15px;
+    }
+
+    .dashboard-header,
+    .device-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sync-info {
+        text-align: left;
+    }
+
+    .health-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .risk-content {
+        grid-template-columns: 1fr;
+    }
+
+    .recommendations {
+        grid-template-columns: 1fr;
+    }
+
+    .monitoring-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .average-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .score-circle {
+        width: 180px;
+        height: 180px;
+    }
+
+    .score-circle::after {
+        width: 140px;
+        height: 140px;
+    }
+
+    .monitoring-section .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .comparison-grid {
+        flex-direction: column;
+    }
+
+    .comparison-box {
+        width: 100%;
+    }
+
+    .comparison-arrow {
+        transform: rotate(90deg);
+    }
+}/* =========================================================
+   EXPLAINABLE AI DASHBOARD
+========================================================= */
+
+.xai-dashboard-panel {
+
+    margin-bottom: 25px;
+
+}
+
+
+/* =========================================================
+   LIVE BADGE
+========================================================= */
+
+.xai-live-badge {
+
+    padding: 7px 12px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+
+    background: rgba(96, 165, 250, 0.12);
+
+    color: #60a5fa;
+
+    border: 1px solid rgba(96, 165, 250, 0.25);
+
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.xai-summary-box {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 16px;
+
+    padding: 20px;
+
+    margin-top: 20px;
+
+    border-radius: 16px;
+
+    background: rgba(96, 165, 250, 0.07);
+
+    border: 1px solid rgba(96, 165, 250, 0.16);
+
+}
+
+
+.xai-brain {
+
+    width: 48px;
+
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: rgba(96, 165, 250, 0.12);
+
+    font-size: 25px;
+
+    flex-shrink: 0;
+
+}
+
+
+.xai-summary-box h3 {
+
+    margin: 0 0 6px 0;
+
+}
+
+
+.xai-summary-box p {
+
+    margin: 0;
+
+    color: #b8c5d6;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+}
+
+
+/* =========================================================
+   COUNT CARDS
+========================================================= */
+
+.xai-count-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+
+    margin-top: 20px;
+
+}
+
+
+.xai-count-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 18px;
+
+    border-radius: 15px;
+
+    background: rgba(255,255,255,0.035);
+
+    border: 1px solid rgba(255,255,255,0.06);
+
+    transition: 0.3s;
+
+}
+
+
+.xai-count-card:hover {
+
+    transform: translateY(-3px);
+
+}
+
+
+.xai-count-icon {
+
+    font-size: 20px;
+
+}
+
+
+.xai-count-card span {
+
+    display: block;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+
+}
+
+
+.xai-count-card strong {
+
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 25px;
+
+}
+
+
+.xai-count-card.high strong {
+
+    color: #f87171;
+
+}
+
+
+.xai-count-card.moderate strong {
+
+    color: #fbbf24;
+
+}
+
+
+.xai-count-card.normal strong {
+
+    color: #4ade80;
+
+}
+
+
+/* =========================================================
+   FACTOR SECTION
+========================================================= */
+
+.xai-factor-section {
+
+    margin-top: 25px;
+
+}
+
+
+.xai-section-title {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 15px;
+
+}
+
+
+.xai-section-title h3 {
+
+    margin: 0;
+
+}
+
+
+.xai-section-title span {
+
+    color: #718096;
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   FACTOR GRID
+========================================================= */
+
+.xai-factor-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 12px;
+
+}
+
+
+.xai-factor-card {
+
+    padding: 16px;
+
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.035);
+
+    border: 1px solid rgba(255,255,255,0.06);
+
+}
+
+
+.xai-factor-top {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+
+.xai-factor-name {
+
+    color: #dce6f5;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.xai-factor-value {
+
+    margin-top: 12px;
+
+    font-size: 23px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.xai-status {
+
+    padding: 4px 8px;
+
+    border-radius: 12px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+}
+
+
+.xai-status.high {
+
+    color: #f87171;
+
+    background: rgba(248,113,113,0.10);
+
+}
+
+
+.xai-status.moderate {
+
+    color: #fbbf24;
+
+    background: rgba(251,191,36,0.10);
+
+}
+
+
+.xai-status.normal {
+
+    color: #4ade80;
+
+    background: rgba(74,222,128,0.10);
+
+}
+
+
+/* =========================================================
+   FACTOR MESSAGE
+========================================================= */
+
+.xai-factor-message {
+
+    margin: 8px 0 0;
+
+    color: #8d9aab;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   PROBABILITY
+========================================================= */
+
+.xai-probability-section {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+
+    margin-top: 20px;
+
+}
+
+
+.xai-probability-card {
+
+    text-align: center;
+
+    padding: 17px;
+
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.035);
+
+    border: 1px solid rgba(255,255,255,0.06);
+
+}
+
+
+.xai-probability-card span {
+
+    display: block;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+
+}
+
+
+.xai-probability-card strong {
+
+    display: block;
+
+    margin-top: 6px;
+
+    font-size: 22px;
+
+    color: #60a5fa;
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.xai-empty {
+
+    text-align: center;
+
+    padding: 35px 20px;
+
+    color: #9ca3af;
+
+}
+
+
+.xai-empty > div {
+
+    font-size: 35px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.xai-empty h3 {
+
+    color: #dce6f5;
+
+    margin: 0 0 7px;
+
+}
+
+
+.xai-empty p {
+
+    margin: 0;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .xai-factor-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .xai-count-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .xai-probability-section {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .xai-factor-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .xai-section-title {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 5px;
+
+    }
+
+}
+/* =========================================================
+   -DAY HEALTH MONITORIN======================================================= */
+
+.health-30-panel {
+    margin-top: 30px;
+    padding: 28px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+}
+
+.health-30-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.health-30-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.health-30-header p {
+    margin-top: 6px;
+    opacity: 0.7;
+}
+
+.observation-status {
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: rgba(0, 180, 255, 0.12);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.health-30-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.health-30-card {
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.health-30-card span {
+    display: block;
+    font-size: 13px;
+    opacity: 0.65;
+    margin-bottom: 8px;
+}
+
+.health-30-card strong {
+    font-size: 23px;
+}
+
+.health-30-comparison {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.risk-period {
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    text-align: center;
+}
+
+.risk-period span {
+    display: block;
+    opacity: 0.65;
+    font-size: 13px;
+}
+
+.risk-period strong {
+    display: block;
+    margin: 8px 0;
+    font-size: 20px;
+}
+
+.risk-period small {
+    opacity: 0.6;
+}
+
+.health-trend-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 22px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.trend-label {
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+.health-trend-box h3 {
+    margin: 8px 0 0;
+}
+
+.trend-direction {
+    text-align: right;
+}
+
+.trend-direction span {
+    display: block;
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+.trend-direction strong {
+    display: block;
+    margin-top: 6px;
+}
+
+.health-average-section {
+    margin-top: 25px;
+}
+
+.health-average-section h3,
+.health-risk-factors h3 {
+    margin-bottom: 15px;
+}
+
+.average-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.average-grid > div {
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.average-grid span {
+    display: block;
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+.average-grid strong {
+    display: block;
+    margin-top: 8px;
+}
+
+.health-risk-factors {
+    margin-top: 25px;
+}
+
+.risk-factor-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.risk-factor-item {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255, 80, 80, 0.12);
+    border: 1px solid rgba(255, 80, 80, 0.2);
+}
+
+.no-risk-factor {
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(50, 200, 120, 0.1);
+}
+
+.health-alert-status {
+    margin-top: 20px;
+}
+
+.alert-success,
+.alert-normal {
+    padding: 14px 18px;
+    border-radius: 12px;
+}
+
+.alert-success {
+    background: rgba(50, 200, 120, 0.12);
+}
+
+.alert-normal {
+    background: rgba(0, 180, 255, 0.1);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .health-30-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .health-30-comparison {
+        grid-template-columns: 1fr;
+    }
+
+    .average-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .health-30-panel {
+        padding: 18px;
+    }
+
+    .health-30-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .health-30-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .average-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .health-trend-box {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .trend-direction {
+        text-align: left;
+    }
+
+}
+/* =========================================================
+   RISK FORECAST
+========================================================= */
+
+.risk-forecast-box {
+    margin-top: 20px;
+    padding: 24px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.risk-forecast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.forecast-label {
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+.risk-forecast-header h3 {
+    margin: 7px 0;
+    font-size: 22px;
+}
+
+.risk-forecast-header p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.6;
+}
+
+.forecast-score {
+    min-width: 130px;
+    text-align: center;
+    padding: 15px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.forecast-score span {
+    display: block;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.forecast-score strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 28px;
+}
+
+.forecast-details {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.forecast-item {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.forecast-item span {
+    display: block;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.forecast-item strong {
+    display: block;
+    margin-top: 7px;
+    font-size: 17px;
+}
+
+.forecast-warning,
+.forecast-good,
+.forecast-stable,
+.forecast-info {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.forecast-warning {
+    background: rgba(255, 70, 70, 0.1);
+}
+
+.forecast-good {
+    background: rgba(50, 200, 120, 0.1);
+}
+
+.forecast-stable {
+    background: rgba(255, 190, 50, 0.1);
+}
+
+.forecast-info {
+    background: rgba(0, 180, 255, 0.1);
+}
+
+
+@media (max-width: 800px) {
+
+    .risk-forecast-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .forecast-score {
+        width: 100%;
+    }
+
+    .forecast-details {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .forecast-details {
+        grid-template-columns: 1fr;
+    }
+
+}
+.dashboard-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 18px;
+    border-radius: 10px;
+    background: #111827;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.dashboard-nav-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+</style>
+
+
+<div class="dashboard-page">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<div class="dashboard-header">
+
+    <div class="dashboard-title">
+
+        <h1>
+            AI Health Dashboard
+        </h1>
+
+        <p>
+            Real-Time Heart &amp; Stroke Risk Monitoring System
+        </p>
+
+        <div class="system-status">
+
+            <span class="status-dot"></span>
+
+            System Online
+
+        </div>
+
+    </div>
+
+
+    <div class="sync-info">
+
+        <strong>
+            Automatic Monitoring
+        </strong>
+
+        <span>
+            Health data synchronized through Health Connect
+        </span>
+
+    </div>
+
+</div>
+    </div>
+
+    <a
+        href="{{ url_for('alert_history.alert_history') }}"
+        class="dashboard-nav-btn"
+    >
+        🚨 Alert History
+    </a>
+
+</div>
+
+<!-- =========================================================
+     DEVICE
+========================================================= -->
+
+<div class="device-bar">
+
+    <div class="device-left">
+
+        <div class="device-icon">
+            ⌚
+        </div>
+
+        <div>
+
+            <div
+                class="device-name"
+                data-device="name"
+            >
+                {{
+                    latest.device_name
+                    if latest and latest.device_name
+                    else "No Device"
+                }}
+            </div>
+
+            <div
+                class="device-source"
+                data-device="source"
+            >
+                Data Source:
+
+                {{
+                    latest.source
+                    if latest and latest.source
+                    else "Health Connect"
+                }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="live-badge">
+        ● LIVE MONITORING
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     HEALTH CARDS
+========================================================= -->
+
+<div class="health-grid">
+
+
+    <!-- HEART RATE -->
+
+    <div class="health-card">
+
+        <div class="card-top">
+
+            <span class="card-label">
+                Heart Rate
+            </span>
+
+            <span class="card-icon">
+                ❤️
+            </span>
+
+        </div>
+
+        <div class="card-value">
+
+            <span data-health="heart-rate">
+
+                {{ latest.heart_rate if latest else "--" }}
+
+            </span>
+
+            <span class="card-unit">
+                BPM
+            </span>
+
+        </div>
+
+        <div class="card-status">
+            Latest reading
+        </div>
+
+    </div>
+
+
+    <!-- SPO2 -->
+
+    <div class="health-card">
+
+        <div class="card-top">
+
+            <span class="card-label">
+                SpO₂
+            </span>
+
+            <span class="card-icon">
+                🫁
+            </span>
+
+        </div>
+
+        <div class="card-value">
+
+            <span data-health="spo2">
+
+                {{ latest.spo2 if latest else "--" }}
+
+            </span>
+
+            <span class="card-unit">
+                %
+            </span>
+
+        </div>
+
+        <div class="card-status">
+            Oxygen saturation
+        </div>
+
+    </div>
+
+
+    <!-- STEPS -->
+
+    <div class="health-card">
+
+        <div class="card-top">
+
+            <span class="card-label">
+                Steps
+            </span>
+
+            <span class="card-icon">
+                👣
+            </span>
+
+        </div>
+
+        <div class="card-value">
+
+            <span data-health="steps">
+
+                {{ latest.steps if latest else "--" }}
+
+            </span>
+
+        </div>
+
+        <div class="card-status">
+            Activity count
+        </div>
+
+    </div>
+
+
+    <!-- BMI -->
+
+    <div class="health-card">
+
+        <div class="card-top">
+
+            <span class="card-label">
+                BMI
+            </span>
+
+            <span class="card-icon">
+                ⚖️
+            </span>
+
+        </div>
+
+        <div class="card-value">
+
+            <span data-profile="bmi">
+
+                {{
+                    user.bmi
+                    if user and user.bmi is not none
+                    else "--"
+                }}
+
+            </span>
+
+        </div>
+
+        <div class="card-status">
+            User profile
+        </div>
+
+    </div>
+
+
+    <!-- CALORIES -->
+
+    <div class="health-card">
+
+        <div class="card-top">
+
+            <span class="card-label">
+                Calories
+            </span>
+
+            <span class="card-icon">
+                🔥
+            </span>
+
+        </div>
+
+        <div class="card-value">
+
+            <span data-health="calories">
+
+                {{
+                    latest.calories
+                    if latest and latest.calories is not none
+                    else "--"
+                }}
+
+            </span>
+
+            <span class="card-unit">
+                kcal
+            </span>
+
+        </div>
+
+        <div class="card-status">
+            Daily activity
+        </div>
+
+    </div>
+
+
+    <!-- DISTANCE -->
+
+    <div class="health-card">
+
+        <div class="card-top">
+
+            <span class="card-label">
+                Distance
+            </span>
+
+            <span class="card-icon">
+                📍
+            </span>
+
+        </div>
+
+        <div class="card-value">
+
+            <span data-health="distance">
+
+                {{
+                    latest.distance
+                    if latest and latest.distance is not none
+                    else "--"
+                }}
+
+            </span>
+
+            <span class="card-unit">
+                km
+            </span>
+
+        </div>
+
+        <div class="card-status">
+            Distance travelled
+        </div>
+
+    </div>
+
+
+    <!-- SLEEP -->
+
+    <div class="health-card">
+
+        <div class="card-top">
+
+            <span class="card-label">
+                Sleep
+            </span>
+
+            <span class="card-icon">
+                😴
+            </span>
+
+        </div>
+
+        <div class="card-value">
+
+            <span data-health="sleep">
+
+                {{
+                    latest.sleep
+                    if latest and latest.sleep is not none
+                    else "--"
+                }}
+
+            </span>
+
+            <span class="card-unit">
+                hrs
+            </span>
+
+        </div>
+
+        <div class="card-status">
+            Sleep duration
+        </div>
+
+    </div>
+
+
+    <!-- HEALTH SCORE -->
+
+    <div class="health-card">
+
+        <div class="card-top">
+
+            <span class="card-label">
+                Health Score
+            </span>
+
+            <span class="card-icon">
+                🧠
+            </span>
+
+        </div>
+
+        <div class="card-value">
+
+            <span data-health="score">
+
+                {{ health_score|default(0) }}
+
+            </span>
+
+            <span class="card-unit">
+                /100
+            </span>
+
+        </div>
+
+        <div class="card-status">
+            Project analytical indicator
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     CHART + HEALTH SCORE
+========================================================= -->
+
+<div class="main-grid">
+
+
+    <!-- HEALTH TREND -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    Health Trends
+                </h2>
+
+                <span>
+                    Historical heart rate and SpO₂ readings
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="healthChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- HEALTH SCORE -->
+
+    <div class="panel score-panel">
+
+        <div
+            class="score-circle"
+            data-score="{{ health_score|default(0) }}"
+        >
+
+            <div class="score-number">
+
+                <strong data-health="score-circle">
+                    {{ health_score|default(0) }}
+                </strong>
+
+                <span>
+                    HEALTH SCORE
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="score-title">
+            Overall Health Indicator
+        </div>
+
+
+        <div class="score-description">
+
+            This is a project-specific analytical
+            indicator generated from the available
+            health parameters.
+
+        </div>
+
+    </div>
+
+</div>
+<!-- =========================================================
+     RISK FORECAST
+========================================================= -->
+
+<div class="risk-forecast-box">
+
+    <div class="risk-forecast-header">
+
+        <div>
+            <span class="forecast-label">
+                🔮 Risk Forecast
+            </span>
+
+            <h3>
+                {{ risk_forecast.direction }}
+            </h3>
+
+            <p>
+                Based on recent health-score and trend changes.
+            </p>
+        </div>
+
+        <div class="forecast-score">
+
+            <span>Current Risk Score</span>
+
+            <strong>
+                {{ risk_forecast.score }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="forecast-details">
+
+        <div class="forecast-item">
+
+            <span>Current Risk</span>
+
+            <strong>
+                {{ risk_forecast.risk }}
+            </strong>
+
+        </div>
+
+
+        <div class="forecast-item">
+
+            <span>Previous Score</span>
+
+            <strong>
+                {% if risk_forecast.previous_score is not none %}
+                    {{ risk_forecast.previous_score }}
+                {% else %}
+                    --
+                {% endif %}
+            </strong>
+
+        </div>
+
+
+        <div class="forecast-item">
+
+            <span>Score Change</span>
+
+            <strong>
+                {% if risk_forecast.score_change > 0 %}
+                    +{{ risk_forecast.score_change }}
+                {% else %}
+                    {{ risk_forecast.score_change }}
+                {% endif %}
+            </strong>
+
+        </div>
+
+
+        <div class="forecast-item">
+
+            <span>Trend</span>
+
+            <strong>
+                {{ risk_forecast.trend }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {% if risk_forecast.direction == "Moving Toward High Risk" %}
+
+        <div class="forecast-warning">
+            ⚠ Your recent health trend is moving toward a
+            higher-risk category. Continue monitoring your
+            health data and consider discussing concerns with
+            a qualified healthcare professional.
+        </div>
+
+    {% elif risk_forecast.direction == "Moving Toward Safe" %}
+
+        <div class="forecast-good">
+            ✅ Your recent health trend is moving toward a
+            safer risk category. Continue maintaining healthy
+            habits and regular monitoring.
+        </div>
+
+    {% elif risk_forecast.direction == "Stable" %}
+
+        <div class="forecast-stable">
+            🟡 Your recent health trend is currently stable.
+        </div>
+
+    {% else %}
+
+        <div class="forecast-info">
+            🔵 More health data is required to determine the
+            risk direction.
+        </div>
+
+    {% endif %}
+
+</div>
+
+<!-- =========================================================
+     AI RISK ASSESSMENT
+========================================================= -->
+
+<div class="panel risk-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                AI Risk Assessment
+            </h2>
+
+            <span>
+                Real-time heart &amp; stroke risk analysis
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="risk-content">
+
+
+        <!-- CURRENT RISK -->
+
+        <div class="risk-box">
+
+            <div class="risk-label">
+                Current Risk
+            </div>
+
+            <div
+                class="risk-value low-risk"
+                data-ai="risk"
+            >
+                {{ risk|default("No Data") }}
+            </div>
+
+        </div>
+
+
+        <!-- CONFIDENCE -->
+
+        <div class="risk-box">
+
+            <div class="risk-label">
+                AI Confidence
+            </div>
+
+            <div
+                class="risk-value"
+                data-ai="confidence"
+            >
+                {{ confidence if confidence else "--" }}%
+            </div>
+
+        </div>
+
+
+        <!-- STROKE PROBABILITY -->
+
+        <div class="risk-box">
+
+            <div class="risk-label">
+                Stroke Probability
+            </div>
+
+            <div
+                class="risk-value"
+                data-ai="stroke-probability"
+            >
+                {{ stroke_probability|default(0) }}%
+            </div>
+
+        </div>
+
+
+        <!-- NORMAL PROBABILITY -->
+
+        <div class="risk-box">
+
+            <div class="risk-label">
+                Normal Probability
+            </div>
+
+            <div
+                class="risk-value"
+                data-ai="normal-probability"
+            >
+                {{ normal_probability|default(0) }}%
+            </div>
+
+        </div>
+
+
+        <!-- MONITORING -->
+
+        <div class="risk-box">
+
+            <div class="risk-label">
+                Monitoring Status
+            </div>
+
+            <div class="risk-value low-risk">
+                Active
+            </div>
+
+            <div class="card-status">
+                Health Connect monitoring enabled.
+            </div>
+
+        </div>
+
+
+        <!-- MODEL -->
+
+        <div class="risk-box">
+
+            <div class="risk-label">
+                AI Model
+            </div>
+
+            <div class="risk-value">
+                XGBoost
+            </div>
+
+            <div class="card-status">
+                Automatic wearable health prediction.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- =====================================================
+     EXPLAINABLE AI
+====================================================== -->
+
+<div class="panel xai-dashboard-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                🧠 Why Did the AI Give This Result?
+            </h2>
+
+            <span>
+                Explainable analysis of the latest automatic health prediction
+            </span>
+
+        </div>
+
+        <div class="xai-live-badge">
+            AI EXPLANATION
+        </div>
+
+    </div>
+
+
+    {% if explanation_data %}
+
+
+    <!-- =================================================
+         AI SUMMARY
+    ================================================== -->
+
+    <div class="xai-summary-box">
+
+        <div class="xai-brain">
+            🧠
+        </div>
+
+        <div>
+
+            <h3>
+                AI Analysis
+            </h3>
+
+            <p>
+                {{ explanation_data.summary }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         FACTOR COUNTS
+    ================================================== -->
+
+    <div class="xai-count-grid">
+
+        <div class="xai-count-card high">
+
+            <div class="xai-count-icon">
+                🔴
+            </div>
+
+            <div>
+
+                <span>
+                    High Factors
+                </span>
+
+                <strong>
+                    {{ explanation_data.high_count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="xai-count-card moderate">
+
+            <div class="xai-count-icon">
+                🟠
+            </div>
+
+            <div>
+
+                <span>
+                    Moderate Factors
+                </span>
+
+                <strong>
+                    {{ explanation_data.moderate_count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="xai-count-card normal">
+
+            <div class="xai-count-icon">
+                🟢
+            </div>
+
+            <div>
+
+                <span>
+                    Normal Factors
+                </span>
+
+                <strong>
+                    {{ explanation_data.normal_count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         HEALTH FACTORS
+    ================================================== -->
+
+    <div class="xai-factor-section">
+
+        <div class="xai-section-title">
+
+            <h3>
+                Health Parameter Analysis
+            </h3>
+
+            <span>
+                Latest automatic prediction
+            </span>
+
+        </div>
+
+
+        <div class="xai-factor-grid">
+
+
+            {% for factor in explanation_data.factors %}
+
+            <div class="xai-factor-card">
+
+
+                <div class="xai-factor-top">
+
+                    <span class="xai-factor-name">
+                        {{ factor.name }}
+                    </span>
+
+
+                    {% if factor.severity == "High" %}
+
+                    <span class="xai-status high">
+                        🔴 High
+                    </span>
+
+
+                    {% elif factor.severity == "Moderate" %}
+
+                    <span class="xai-status moderate">
+                        🟠 Moderate
+                    </span>
+
+
+                    {% else %}
+
+                    <span class="xai-status normal">
+                        🟢 Normal
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="xai-factor-value">
+
+                    {{ factor.value }}
+
+                </div>
+
+
+                {% if factor.message %}
+
+                <p class="xai-factor-message">
+                    {{ factor.message }}
+                </p>
+
+                {% endif %}
+
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         PROBABILITY SUMMARY
+    ================================================== -->
+
+    <div class="xai-probability-section">
+
+        <div class="xai-probability-card">
+
+            <span>
+                Stroke Probability
+            </span>
+
+            <strong>
+                {{ stroke_probability }}%
+            </strong>
+
+        </div>
+
+
+        <div class="xai-probability-card">
+
+            <span>
+                Normal Probability
+            </span>
+
+            <strong>
+                {{ normal_probability }}%
+            </strong>
+
+        </div>
+
+
+        <div class="xai-probability-card">
+
+            <span>
+                Model Confidence
+            </span>
+
+            <strong>
+                {{ confidence }}%
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {% else %}
+
+    <!-- =================================================
+         NO XAI DATA
+    ================================================== -->
+
+    <div class="xai-empty">
+
+        <div>
+            🧠
+        </div>
+
+        <h3>
+            No AI explanation available yet
+        </h3>
+
+        <p>
+            Synchronize health data from your smartwatch
+            to generate an automatic AI explanation.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+<!-- =========================================================
+     DAY HEALTH MONITORING
+========================================================= -->
+
+<section class="health-30-panel">
+
+    <div class="health-30-header">
+        <div>
+            <h2>📊 10-Day Health Monitoring</h2>
+            <p>
+                Continuous analysis of your health data and risk trend.
+            </p>
+        </div>
+
+        <div class="observation-status">
+            {{ thirty_day_result.observation_status }}
+        </div>
+    </div>
+
+
+    <!-- TOP SUMMARY -->
+
+    <div class="health-30-grid">
+
+        <div class="health-30-card">
+            <span>Days Observed</span>
+            <strong>
+                {{ thirty_day_result.days_observed }}/10
+            </strong>
+        </div>
+
+        <div class="health-30-card">
+            <span>Total Records</span>
+            <strong>
+                {{ thirty_day_result.total_records }}
+            </strong>
+        </div>
+
+        <div class="health-30-card">
+            <span>Current Risk</span>
+            <strong>
+                {{ thirty_day_result.risk }}
+            </strong>
+        </div>
+
+        <div class="health-30-card">
+            <span>Risk Score</span>
+            <strong>
+                {{ thirty_day_result.risk_score }}
+            </strong>
+        </div>
+
+    </div>
+
+
+    <!-- RISK COMPARISON -->
+
+    <div class="health-30-comparison">
+
+        <div class="risk-period">
+            <span>Overall Risk</span>
+            <strong>
+                {{ thirty_day_result.overall_risk }}
+            </strong>
+            <small>
+                Score:
+                {{ thirty_day_result.overall_risk_score }}
+            </small>
+        </div>
+
+        <div class="risk-period">
+            <span>Recent 7 Days</span>
+            <strong>
+                {{ thirty_day_result.recent_risk }}
+            </strong>
+            <small>
+                Score:
+                {{ thirty_day_result.recent_risk_score }}
+            </small>
+        </div>
+
+        <div class="risk-period">
+            <span>Previous Period</span>
+            <strong>
+                {{ thirty_day_result.previous_risk }}
+            </strong>
+            <small>
+                Score:
+                {{ thirty_day_result.previous_risk_score }}
+            </small>
+        </div>
+
+    </div>
+
+
+    <!-- TREND -->
+
+    <div class="health-trend-box">
+
+        <div>
+            <span class="trend-label">
+                Health Trend
+            </span>
+
+            <h3>
+                {% if thirty_day_result.trend == "Worsening" %}
+                    🔴 Worsening
+                {% elif thirty_day_result.trend == "Improving" %}
+                    🟢 Improving
+                {% elif thirty_day_result.trend == "Stable" %}
+                    🟡 Stable
+                {% else %}
+                    🔵 Insufficient Data
+                {% endif %}
+            </h3>
+        </div>
+
+        <div class="trend-direction">
+
+            <span>Direction</span>
+
+            <strong>
+                {{ thirty_day_result.direction }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- AVERAGES -->
+
+    <div class="health-average-section">
+
+        <h3>Average Health Metrics</h3>
+
+        <div class="average-grid">
+
+            <div>
+                <span>❤️ Heart Rate</span>
+                <strong>
+                    {{ thirty_day_result.average_heart_rate or "--" }}
+                    BPM
+                </strong>
+            </div>
+
+            <div>
+                <span>🫁 SpO₂</span>
+                <strong>
+                    {{ thirty_day_result.average_spo2 or "--" }}
+                    %
+                </strong>
+            </div>
+
+            <div>
+                <span>🚶 Steps</span>
+                <strong>
+                    {{ thirty_day_result.average_steps or "--" }}
+                </strong>
+            </div>
+
+            <div>
+                <span>😴 Sleep</span>
+                <strong>
+                    {{ thirty_day_result.average_sleep or "--" }}
+                    hrs
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RISK FACTORS -->
+
+    <div class="health-risk-factors">
+
+        <h3>⚠ Risk Factors</h3>
+
+        {% if thirty_day_result.risk_factors %}
+
+            <div class="risk-factor-list">
+
+                {% for factor in thirty_day_result.risk_factors %}
+
+                    <div class="risk-factor-item">
+                        ⚠ {{ factor }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="no-risk-factor">
+                ✅ No significant risk factors detected
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ALERT STATUS -->
+
+    <div class="health-alert-status">
+
+        {% if thirty_day_result.alert_sent %}
+
+            <div class="alert-success">
+                📧 Health alert email sent successfully.
+            </div>
+
+        {% else %}
+
+            <div class="alert-normal">
+                🔔 No health alert triggered.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+<!-- =========================================================
+     RECOMMENDATIONS
+========================================================= -->
+
+<div
+    class="panel"
+    style="margin-bottom:25px;"
+>
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                AI Recommendations
+            </h2>
+
+            <span>
+                General project recommendations
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="recommendations">
+
+
+        <div class="recommendation">
+
+            <div class="recommendation-icon">
+                💧
+            </div>
+
+            <h3>
+                Stay Hydrated
+            </h3>
+
+            <p>
+                Maintain adequate hydration throughout
+                the day.
+            </p>
+
+        </div>
+
+
+        <div class="recommendation">
+
+            <div class="recommendation-icon">
+                🚶
+            </div>
+
+            <h3>
+                Stay Active
+            </h3>
+
+            <p>
+                Maintain regular physical activity
+                according to your routine.
+            </p>
+
+        </div>
+
+
+        <div class="recommendation">
+
+            <div class="recommendation-icon">
+                🥗
+            </div>
+
+            <h3>
+                Balanced Diet
+            </h3>
+
+            <p>
+                Follow a balanced nutritional routine.
+            </p>
+
+        </div>
+
+
+        <div class="recommendation">
+
+            <div class="recommendation-icon">
+                😴
+            </div>
+
+            <h3>
+                Quality Sleep
+            </h3>
+
+            <p>
+                Maintain a consistent sleep routine.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     LATEST PREDICTION
+========================================================= -->
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Latest Prediction
+            </h2>
+
+            <span>
+                Most recent AI model result
+            </span>
+
+        </div>
+
+    </div>
+
+
+    {% if latest_prediction %}
+
+    <div class="history-table-wrapper">
+
+        <table class="history-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>Heart Rate</th>
+
+                    <th>SpO₂</th>
+
+                    <th>Glucose</th>
+
+                    <th>BMI</th>
+
+                    <th>Steps</th>
+
+                    <th>Prediction</th>
+
+                    <th>Confidence</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                <tr>
+
+                    <td>
+
+                        {{
+                            latest_prediction.created_at.strftime(
+                                "%d/%m/%Y %H:%M"
+                            )
+                            if latest_prediction.created_at
+                            else "--"
+                        }}
+
+                    </td>
+
+
+                    <td>
+                        {{
+                            latest_prediction.heart_rate
+                            if latest_prediction.heart_rate is not none
+                            else "--"
+                        }}
+                    </td>
+
+
+                    <td>
+                        {{
+                            latest_prediction.spo2
+                            if latest_prediction.spo2 is not none
+                            else "--"
+                        }}
+                    </td>
+
+
+                    <td>
+                        {{
+                            latest_prediction.glucose
+                            if latest_prediction.glucose is not none
+                            else "--"
+                        }}
+                    </td>
+
+
+                    <td>
+                        {{
+                            latest_prediction.bmi
+                            if latest_prediction.bmi is not none
+                            else "--"
+                        }}
+                    </td>
+
+
+                    <td>
+                        {{
+                            latest_prediction.steps
+                            if latest_prediction.steps is not none
+                            else "--"
+                        }}
+                    </td>
+
+
+                    <td>
+                        {{
+                            latest_prediction.prediction
+                            if latest_prediction.prediction
+                            else "--"
+                        }}
+                    </td>
+
+
+                    <td>
+                        {{
+                            latest_prediction.confidence
+                            if latest_prediction.confidence is not none
+                            else "--"
+                        }}%
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+    <div class="empty-state">
+
+        No prediction history available yet.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================================================
+     30 DAY HEALTH MONITORING
+========================================================= -->
+
+<section class="monitoring-section">
+
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>
+                10-Day Health Monitoring
+            </h2>
+
+            <p>
+                Continuous health observation and risk trend analysis
+            </p>
+
+        </div>
+
+
+        <div class="observation-status">
+
+            {{
+                thirty_day_result.observation_status
+                if thirty_day_result
+                else "No Data"
+            }}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RISK CARDS
+    ====================================================== -->
+
+    <div class="monitoring-cards">
+
+
+        <!-- CURRENT RISK -->
+
+        <div class="monitor-card">
+
+            <div class="monitor-icon">
+                ❤️
+            </div>
+
+            <div class="monitor-content">
+
+                <span class="monitor-label">
+                    Current Risk
+                </span>
+
+                <h3>
+                    {{
+                        thirty_day_result.risk
+                        if thirty_day_result
+                        else "No Data"
+                    }}
+                </h3>
+
+                <p>
+                    Risk Score:
+
+                    <strong>
+                        {{
+                            thirty_day_result.risk_score
+                            if thirty_day_result
+                            else 0
+                        }}
+                    </strong>
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- TREND -->
+
+        <div class="monitor-card">
+
+            <div class="monitor-icon">
+                📈
+            </div>
+
+            <div class="monitor-content">
+
+                <span class="monitor-label">
+                    Health Trend
+                </span>
+
+                <h3>
+                    {{
+                        thirty_day_result.trend
+                        if thirty_day_result
+                        else "Insufficient Data"
+                    }}
+                </h3>
+
+                <p>
+                    {{
+                        thirty_day_result.direction
+                        if thirty_day_result
+                        else "Collecting data"
+                    }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- OBSERVATION -->
+
+        <div class="monitor-card">
+
+            <div class="monitor-icon">
+                📅
+            </div>
+
+            <div class="monitor-content">
+
+                <span class="monitor-label">
+                    Observation Period
+                </span>
+
+                <h3>
+
+                    {{
+                        thirty_day_result.days_observed
+                        if thirty_day_result
+                        else 0
+                    }}/10
+
+                </h3>
+
+                <p>
+                    Days observed
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECORDS -->
+
+        <div class="monitor-card">
+
+            <div class="monitor-icon">
+                📊
+            </div>
+
+            <div class="monitor-content">
+
+                <span class="monitor-label">
+                    Health Records
+                </span>
+
+                <h3>
+
+                    {{
+                        thirty_day_result.total_records
+                        if thirty_day_result
+                        else 0
+                    }}
+
+                </h3>
+
+                <p>
+                    Total measurements
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         OBSERVATION PROGRESS
+    ====================================================== -->
+
+    <div class="observation-progress">
+
+
+        <div class="progress-header">
+
+            <span>
+                10-Day Observation Progress
+            </span>
+
+            <strong>
+
+                {{
+                    thirty_day_result.days_observed
+                    if thirty_day_result
+                    else 0
+                }}/10 days
+
+            </strong>
+
+        </div>
+
+
+        <div class="observation-progress-bar">
+
+            <div
+                class="observation-progress-fill"
+                data-progress="
+                    {{
+                        (
+                            thirty_day_result.days_observed
+                            if thirty_day_result
+                            else 0
+                        )
+                    }}
+                "
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         HEALTH AVERAGES
+    ====================================================== -->
+
+    <div class="average-section">
+
+        <h3>
+            10-Day Health Averages
+        </h3>
+
+
+        <div class="average-grid">
+
+
+            <!-- HEART RATE -->
+
+            <div class="average-card">
+
+                <span class="average-icon">
+                    ❤️
+                </span>
+
+                <div>
+
+                    <span class="average-label">
+                        Heart Rate
+                    </span>
+
+                    <strong>
+
+                        {% if
+                            thirty_day_result
+                            and thirty_day_result.average_heart_rate
+                            is not none
+                        %}
+
+                            {{ thirty_day_result.average_heart_rate }}
+                            BPM
+
+                        {% else %}
+
+                            --
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- SPO2 -->
+
+            <div class="average-card">
+
+                <span class="average-icon">
+                    🫁
+                </span>
+
+                <div>
+
+                    <span class="average-label">
+                        SpO₂
+                    </span>
+
+                    <strong>
+
+                        {% if
+                            thirty_day_result
+                            and thirty_day_result.average_spo2
+                            is not none
+                        %}
+
+                            {{ thirty_day_result.average_spo2 }}%
+
+                        {% else %}
+
+                            --
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- STEPS -->
+
+            <div class="average-card">
+
+                <span class="average-icon">
+                    👟
+                </span>
+
+                <div>
+
+                    <span class="average-label">
+                        Daily Steps
+                    </span>
+
+                    <strong>
+
+                        {% if
+                            thirty_day_result
+                            and thirty_day_result.average_steps
+                            is not none
+                        %}
+
+                            {{
+                                "{:,.0f}".format(
+                                    thirty_day_result.average_steps
+                                )
+                            }}
+
+                        {% else %}
+
+                            --
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- SLEEP -->
+
+            <div class="average-card">
+
+                <span class="average-icon">
+                    😴
+                </span>
+
+                <div>
+
+                    <span class="average-label">
+                        Sleep
+                    </span>
+
+                    <strong>
+
+                        {% if
+                            thirty_day_result
+                            and thirty_day_result.average_sleep
+                            is not none
+                        %}
+
+                            {{ thirty_day_result.average_sleep }}
+                            hrs
+
+                        {% else %}
+
+                            --
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT VS PREVIOUS
+    ====================================================== -->
+
+    <div class="comparison-section">
+
+        <h3>
+            Recent Health Trend
+        </h3>
+
+
+        <div class="comparison-grid">
+
+
+            <div class="comparison-box">
+
+                <span>
+                    Recent 7 Days
+                </span>
+
+                <strong>
+
+                    {{
+                        thirty_day_result.recent_risk
+                        if thirty_day_result
+                        else "Insufficient Data"
+                    }}
+
+                </strong>
+
+                <small>
+
+                    Risk Score:
+
+                    {{
+                        thirty_day_result.recent_risk_score
+                        if thirty_day_result
+                        and thirty_day_result.recent_risk_score
+                        is not none
+                        else "--"
+                    }}
+
+                </small>
+
+            </div>
+
+
+            <div class="comparison-arrow">
+                →
+            </div>
+
+
+            <div class="comparison-box">
+
+                <span>
+                    Previous Period
+                </span>
+
+                <strong>
+
+                    {{
+                        thirty_day_result.previous_risk
+                        if thirty_day_result
+                        else "Insufficient Data"
+                    }}
+
+                </strong>
+
+                <small>
+
+                    Risk Score:
+
+                    {{
+                        thirty_day_result.previous_risk_score
+                        if thirty_day_result
+                        and thirty_day_result.previous_risk_score
+                        is not none
+                        else "--"
+                    }}
+
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TREND MESSAGE
+        ================================================== -->
+
+        {% if
+            thirty_day_result
+            and thirty_day_result.trend == "Worsening"
+        %}
+
+        <div class="trend-warning">
+
+            <span>
+                ⚠️
+            </span>
+
+            <div>
+
+                <strong>
+                    Health trend is worsening
+                </strong>
+
+                <p>
+                    Recent health measurements show
+                    an increase in calculated risk.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% elif
+            thirty_day_result
+            and thirty_day_result.trend == "Improving"
+        %}
+
+        <div class="trend-success">
+
+            <span>
+                ✅
+            </span>
+
+            <div>
+
+                <strong>
+                    Health trend is improving
+                </strong>
+
+                <p>
+                    Recent measurements indicate
+                    a lower calculated risk.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% elif
+            thirty_day_result
+            and thirty_day_result.trend == "Stable"
+        %}
+
+        <div class="trend-stable">
+
+            <span>
+                ℹ️
+            </span>
+
+            <div>
+
+                <strong>
+                    Health trend is stable
+                </strong>
+
+                <p>
+                    No significant change in calculated risk.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% else %}
+
+        <div class="trend-info">
+
+            <span>
+                ℹ️
+            </span>
+
+            <div>
+
+                <strong>
+                    Building health baseline
+                </strong>
+
+                <p>
+                    Continue syncing smartwatch data
+                    to improve the 10-day analysis.
+                </p>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+</div>
+
+
+<!-- =========================================================
+     DASHBOARD DATA
+========================================================= -->
+
+<script id="dashboard-data" type="application/json">
+
+{
+    "dates": {{ dates | default([]) | tojson }},
+    "heartRate": {{ heart_rate | default([]) | tojson }},
+    "spo2": {{ spo2 | default([]) | tojson }},
+    "healthScore": {{ health_score | default(0) | tojson }}
+}
+
+</script>
+
+
+<!-- =========================================================
+     CHART.JS
+========================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+/* =========================================================
+   HEALTH SCORE CIRCLE
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const scoreCircle =
+            document.querySelector(
+                ".score-circle"
+            );
+
+        if (scoreCircle) {
+
+            let score =
+                parseFloat(
+                    scoreCircle.dataset.score
+                ) || 0;
+
+            score =
+                Math.max(
+                    0,
+                    Math.min(score, 100)
+                );
+
+            scoreCircle.style.setProperty(
+                "--score",
+                score + "%"
+            );
+        }
+
+
+        /* =================================================
+          
+        ================================================= */
+
+        const progressBar =
+            document.querySelector(
+                ".observation-progress-fill"
+            );
+
+        if (progressBar) {
+
+            let days =
+                parseFloat(
+                    progressBar.dataset.progress
+                ) || 0;
+
+            let progress =
+                (days / 30) * 100;
+
+            progress =
+                Math.max(
+                    0,
+                    Math.min(progress, 100)
+                );
+
+            progressBar.style.width =
+                progress + "%";
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LIVE HEALTH TREND CHART
+========================================================= */
+
+let healthChart = null;
+
+
+async function updateHealthChart() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/dashboard_data",
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Dashboard API returned " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (data.status !== "success") {
+
+            console.error(
+                "Dashboard API error:",
+                data.message
+            );
+
+            return;
+
+        }
+
+
+        const dates =
+            data.dates || [];
+
+
+        const heartRate =
+            data.heartRate || [];
+
+
+        const spo2 =
+            data.spo2 || [];
+
+
+        const canvas =
+            document.getElementById(
+                "healthChart"
+            );
+
+
+        if (!canvas) {
+
+            console.error(
+                "healthChart canvas not found"
+            );
+
+            return;
+
+        }
+
+
+        /* =================================================
+           CREATE CHART
+        ================================================= */
+
+        if (!healthChart) {
+
+            const ctx =
+                canvas.getContext(
+                    "2d"
+                );
+
+
+            healthChart =
+                new Chart(
+                    ctx,
+                    {
+
+                        type: "line",
+
+                        data: {
+
+                            labels: dates,
+
+                            datasets: [
+
+                                {
+
+                                    label:
+                                        "Heart Rate",
+
+                                    data:
+                                        heartRate,
+
+                                    borderWidth: 3,
+
+                                    tension: 0.35,
+
+                                    fill: false,
+
+                                    pointRadius: 4
+
+                                },
+
+
+                                {
+
+                                    label:
+                                        "SpO₂",
+
+                                    data:
+                                        spo2,
+
+                                    borderWidth: 3,
+
+                                    tension: 0.35,
+
+                                    fill: false,
+
+                                    pointRadius: 4
+
+                                }
+
+                            ]
+
+                        },
+
+
+                        options: {
+
+                            responsive: true,
+
+                            maintainAspectRatio: false,
+
+
+                            interaction: {
+
+                                intersect: false,
+
+                                mode: "index"
+
+                            },
+
+
+                            plugins: {
+
+                                legend: {
+
+                                    display: true
+
+                                }
+
+                            },
+
+
+                            scales: {
+
+                                x: {
+
+                                    ticks: {
+
+                                        color:
+                                            "#9ca3af"
+
+                                    },
+
+                                    grid: {
+
+                                        display:
+                                            false
+
+                                    }
+
+                                },
+
+
+                                y: {
+
+                                    beginAtZero:
+                                        false,
+
+                                    ticks: {
+
+                                        color:
+                                            "#9ca3af"
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                );
+
+        }
+
+
+        /* =================================================
+           UPDATE EXISTING CHART
+        ================================================= */
+
+        else {
+
+            healthChart.data.labels =
+                dates;
+
+
+            healthChart.data.datasets[0].data =
+                heartRate;
+
+
+            healthChart.data.datasets[1].data =
+                spo2;
+
+
+            healthChart.update(
+                "none"
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Health chart update failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   UPDATE LIVE DASHBOARD DATA
+========================================================= */
+
+async function updateDashboard() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/dashboard_data",
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Dashboard API returned " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (data.status !== "success") {
+
+            console.error(
+                "Dashboard API error:",
+                data.message
+            );
+
+            return;
+
+        }
+
+
+        const health =
+            data.health || {};
+
+
+        /* =================================================
+           HEART RATE
+        ================================================= */
+
+        const heartRateElement =
+            document.querySelector(
+                "[data-health='heart-rate']"
+            );
+
+
+        if (heartRateElement) {
+
+            heartRateElement.textContent =
+                health.heart_rate ?? "--";
+
+        }
+
+
+        /* =================================================
+           SPO2
+        ================================================= */
+
+        const spo2Element =
+            document.querySelector(
+                "[data-health='spo2']"
+            );
+
+
+        if (spo2Element) {
+
+            spo2Element.textContent =
+                health.spo2 ?? "--";
+
+        }
+
+
+        /* =================================================
+           STEPS
+        ================================================= */
+
+        const stepsElement =
+            document.querySelector(
+                "[data-health='steps']"
+            );
+
+
+        if (stepsElement) {
+
+            const value =
+                health.steps;
+
+            stepsElement.textContent =
+                value !== null &&
+                value !== undefined
+                    ? Number(value).toLocaleString()
+                    : "--";
+
+        }
+
+
+        /* =================================================
+           CALORIES
+        ================================================= */
+
+        const caloriesElement =
+            document.querySelector(
+                "[data-health='calories']"
+            );
+
+
+        if (caloriesElement) {
+
+            caloriesElement.textContent =
+                health.calories ?? "--";
+
+        }
+
+
+        /* =================================================
+           DISTANCE
+        ================================================= */
+
+        const distanceElement =
+            document.querySelector(
+                "[data-health='distance']"
+            );
+
+
+        if (distanceElement) {
+
+            distanceElement.textContent =
+                health.distance ?? "--";
+
+        }
+
+
+        /* =================================================
+           SLEEP
+        ================================================= */
+
+        const sleepElement =
+            document.querySelector(
+                "[data-health='sleep']"
+            );
+
+
+        if (sleepElement) {
+
+            sleepElement.textContent =
+                health.sleep ?? "--";
+
+        }
+
+
+        /* =================================================
+           HEALTH SCORE
+        ================================================= */
+
+        const scoreElement =
+            document.querySelector(
+                "[data-health='score']"
+            );
+
+
+        const scoreCircleElement =
+            document.querySelector(
+                "[data-health='score-circle']"
+            );
+
+
+        const score =
+            data.health_score ?? 0;
+
+
+        if (scoreElement) {
+
+            scoreElement.textContent =
+                score;
+
+        }
+
+
+        if (scoreCircleElement) {
+
+            scoreCircleElement.textContent =
+                score;
+
+        }
+
+
+        const scoreCircle =
+            document.querySelector(
+                ".score-circle"
+            );
+
+
+        if (scoreCircle) {
+
+            let numericScore =
+                parseFloat(score) || 0;
+
+            numericScore =
+                Math.max(
+                    0,
+                    Math.min(
+                        numericScore,
+                        100
+                    )
+                );
+
+            scoreCircle.style.setProperty(
+                "--score",
+                numericScore + "%"
+            );
+
+        }
+
+
+        /* =================================================
+           AI RISK
+        ================================================= */
+
+        if (data.ai) {
+
+            const riskElement =
+                document.querySelector(
+                    "[data-ai='risk']"
+                );
+
+
+            if (riskElement) {
+
+                riskElement.textContent =
+                    data.ai.risk ??
+                    "No Data";
+
+            }
+
+
+            const confidenceElement =
+                document.querySelector(
+                    "[data-ai='confidence']"
+                );
+
+
+            if (confidenceElement) {
+
+                confidenceElement.textContent =
+                    (
+                        data.ai.confidence ??
+                        0
+                    ) + "%";
+
+            }
+
+
+            const strokeElement =
+                document.querySelector(
+                    "[data-ai='stroke-probability']"
+                );
+
+
+            if (strokeElement) {
+
+                strokeElement.textContent =
+                    (
+                        data.ai.stroke_probability ??
+                        0
+                    ) + "%";
+
+            }
+
+
+            const normalElement =
+                document.querySelector(
+                    "[data-ai='normal-probability']"
+                );
+
+
+            if (normalElement) {
+
+                normalElement.textContent =
+                    (
+                        data.ai.normal_probability ??
+                        0
+                    ) + "%";
+
+            }
+
+        }
+
+
+        /* =================================================
+           DEVICE
+        ================================================= */
+
+        const deviceElement =
+            document.querySelector(
+                "[data-device='name']"
+            );
+
+
+        if (deviceElement) {
+
+            deviceElement.textContent =
+                data.device_name ??
+                "Unknown";
+
+        }
+
+
+        /* =================================================
+           SOURCE
+        ================================================= */
+
+        const sourceElement =
+            document.querySelector(
+                "[data-device='source']"
+            );
+
+
+        if (sourceElement) {
+
+            sourceElement.textContent =
+                "Data Source: " +
+                (
+                    data.source ??
+                    "Health Connect"
+                );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Live dashboard update failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
+
+updateHealthChart();
+
+updateDashboard();
+
+
+/* =========================================================
+   AUTOMATIC API REFRESH
+========================================================= */
+
+setInterval(
+    updateHealthChart,
+    30000
+);
+
+
+setInterval(
+    updateDashboard,
+    30000
+);
+
+</script>
+
+
+{% endblock %}

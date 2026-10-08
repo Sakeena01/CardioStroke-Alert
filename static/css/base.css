@@ -1,0 +1,420 @@
+/* =====================================================
+   CARDIOSTROKE AI
+   GLOBAL DARK AI HEALTHCARE THEME
+   ===================================================== */
+
+
+/* ================= RESET ================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+
+body {
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 70% 20%,
+            rgba(0, 229, 255, 0.08),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 30% 80%,
+            rgba(124, 58, 237, 0.08),
+            transparent 30%
+        ),
+
+        #03050b;
+
+    color: #ffffff;
+
+    overflow-x: hidden;
+}
+
+
+/* ================= APP ================= */
+
+.app {
+
+    display: flex;
+
+    min-height: 100vh;
+
+    width: 100%;
+}
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+
+    background: linear-gradient(
+        180deg,
+        #071525 0%,
+        #06101d 55%,
+        #030a13 100%
+    );
+
+    border-right: 1px solid rgba(0, 229, 255, 0.18);
+
+    padding: 32px 18px;
+
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+
+    z-index: 1000;
+
+    box-shadow:
+        8px 0 30px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 5px 10px 35px;
+}
+
+
+.brand-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    font-size: 27px;
+
+    background: linear-gradient(
+        145deg,
+        #061b2b,
+        #071321
+    );
+
+    border: 1px solid rgba(0, 229, 255, 0.45);
+
+    box-shadow:
+        0 0 20px rgba(0, 229, 255, 0.18);
+
+    flex-shrink: 0;
+}
+
+
+.brand h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    letter-spacing: -0.4px;
+}
+
+
+.brand span {
+    display: block;
+
+    color: #00e5ff;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.sidebar nav {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    width: 100%;
+}
+
+
+/* Navigation links */
+
+.sidebar nav a {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 13px 14px;
+
+    border-radius: 12px;
+
+    color: #aebdce;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+/* Icons */
+
+.sidebar nav a:first-letter {
+    font-size: 17px;
+}
+
+
+/* Hover */
+
+.sidebar nav a:hover {
+    color: #ffffff;
+
+    background: rgba(0, 229, 255, 0.09);
+
+    transform: translateX(4px);
+
+    box-shadow:
+        inset 3px 0 0 #00e5ff;
+}
+
+
+/* Active */
+
+.sidebar nav a.active {
+    color: #ffffff;
+
+    background: linear-gradient(
+        90deg,
+        rgba(0, 229, 255, 0.18),
+        rgba(0, 229, 255, 0.05)
+    );
+
+    box-shadow:
+        inset 3px 0 0 #00e5ff,
+        0 0 18px rgba(0, 229, 255, 0.10);
+}
+
+
+/* =========================================================
+   SYSTEM STATUS
+========================================================= */
+
+.system-status {
+    margin-top: auto;
+
+    padding: 16px;
+
+    border-radius: 16px;
+
+    background: rgba(0, 229, 255, 0.055);
+
+    border: 1px solid rgba(0, 229, 255, 0.22);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    box-shadow:
+        0 0 20px rgba(0, 229, 255, 0.05);
+}
+
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #00ff9d;
+
+    box-shadow:
+        0 0 10px #00ff9d,
+        0 0 20px rgba(0, 255, 157, 0.5);
+
+    flex-shrink: 0;
+
+    animation: onlinePulse 2s infinite;
+}
+
+
+.system-status strong {
+    display: block;
+
+    color: #00ff9d;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+.system-status small {
+    display: block;
+
+    color: #718096;
+
+    font-size: 11px;
+
+    margin-top: 5px;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.main-content {
+    margin-left: 250px;
+
+    min-height: 100vh;
+
+    padding: 35px 42px;
+
+    box-sizing: border-box;
+
+    background:
+        radial-gradient(
+            circle at 80% 10%,
+            rgba(0, 229, 255, 0.045),
+            transparent 30%
+        );
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes onlinePulse {
+
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.55;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 210px;
+    }
+
+    .main-content {
+        margin-left: 210px;
+
+        padding: 25px;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .sidebar {
+        width: 72px;
+
+        padding: 25px 10px;
+    }
+
+    .brand {
+        justify-content: center;
+
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .brand > div:last-child {
+        display: none;
+    }
+
+    .sidebar nav a {
+        justify-content: center;
+
+        padding: 13px 8px;
+
+        font-size: 0;
+    }
+
+    .system-status {
+        justify-content: center;
+
+        padding: 12px 5px;
+    }
+
+    .system-status > div:last-child {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 72px;
+
+        padding: 20px;
+    }
+}

@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+
+{% block title %}AI Prediction{% endblock %}
+
+{% block css %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/prediction.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="prediction-page">
+
+    <!-- HEADER -->
+
+    <div class="prediction-header">
+
+        <div>
+            <span class="page-label">AI HEALTH ANALYSIS</span>
+
+            <h1>Heart & Stroke Prediction</h1>
+
+            <p>
+                Enter the health measurements below to analyze
+                your current health condition.
+            </p>
+        </div>
+
+        <div class="ai-status">
+            <span></span>
+            AI Model Ready
+        </div>
+
+    </div>
+
+
+    <!-- INPUT CARD -->
+
+    <div class="prediction-card">
+
+        <div class="card-heading">
+
+            <div>
+                <h2>Health Measurements</h2>
+
+                <p>
+                    Provide your latest health information
+                </p>
+            </div>
+
+            <div class="heading-icon">
+                ✦
+            </div>
+
+        </div>
+
+
+        <form action="{{ url_for('prediction.predict') }}"
+              method="POST">
+
+
+            <div class="input-grid">
+
+
+                <!-- AGE -->
+
+                <div class="input-box">
+
+                    <label>Age</label>
+
+                    <input
+                        type="number"
+                        name="age"
+                        min="1"
+                        max="120"
+                        placeholder="Enter age"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- HEART RATE -->
+
+                <div class="input-box">
+
+                    <label>Heart Rate</label>
+
+                    <div class="input-with-unit">
+
+                        <input
+                            type="number"
+                            name="heart_rate"
+                            min="30"
+                            max="220"
+                            placeholder="75"
+                            required
+                        >
+
+                        <span>BPM</span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SPO2 -->
+
+                <div class="input-box">
+
+                    <label>Blood Oxygen</label>
+
+                    <div class="input-with-unit">
+
+                        <input
+                            type="number"
+                            name="spo2"
+                            min="50"
+                            max="100"
+                            placeholder="98"
+                            required
+                        >
+
+                        <span>%</span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SYSTOLIC -->
+
+                <div class="input-box">
+
+                    <label>Systolic BP</label>
+
+                    <div class="input-with-unit">
+
+                        <input
+                            type="number"
+                            name="sbp"
+                            min="50"
+                            max="250"
+                            placeholder="120"
+                            required
+                        >
+
+                        <span>mmHg</span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DIASTOLIC -->
+
+                <div class="input-box">
+
+                    <label>Diastolic BP</label>
+
+                    <div class="input-with-unit">
+
+                        <input
+                            type="number"
+                            name="dbp"
+                            min="30"
+                            max="150"
+                            placeholder="80"
+                            required
+                        >
+
+                        <span>mmHg</span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BMI -->
+
+                <div class="input-box">
+
+                    <label>BMI</label>
+
+                    <input
+                        type="number"
+                        step="0.1"
+                        name="bmi"
+                        min="5"
+                        max="80"
+                        placeholder="22.5"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- GLUCOSE -->
+
+                <div class="input-box">
+
+                    <label>Glucose</label>
+
+                    <div class="input-with-unit">
+
+                        <input
+                            type="number"
+                            name="glucose"
+                            min="30"
+                            max="500"
+                            placeholder="100"
+                            required
+                        >
+
+                        <span>mg/dL</span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STEPS -->
+
+                <div class="input-box">
+
+                    <label>Steps Today</label>
+
+                    <input
+                        type="number"
+                        name="steps"
+                        min="0"
+                        max="100000"
+                        placeholder="5000"
+                        required
+                    >
+
+                </div>
+
+                <!-- EMAIL -->
+
+                <div class="input-box">
+
+                    <label>Email for Alert</label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="your@email.com"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <button
+                type="submit"
+                class="predict-btn"
+            >
+
+                <span>✦</span>
+
+                Predict Health Risk
+
+                <span>→</span>
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- RESULT -->
+
+    {% if prediction %}
+
+    <div class="prediction-result">
+
+
+        <!-- RESULT HEADER -->
+
+        <div class="result-header">
+
+            <div>
+
+                <span class="page-label">
+                    AI ANALYSIS COMPLETE
+                </span>
+
+                <h2>
+                    Prediction Result
+                </h2>
+
+            </div>
+
+            <div class="result-status
+                {% if prediction|int == 1 %}
+                    high
+                {% else %}
+                    low
+                {% endif %}
+            ">
+
+                {{ prediction }}
+
+            </div>
+
+        </div>
+
+
+        <!-- RESULT METRICS -->
+
+        <div class="result-grid">
+
+
+            <div class="result-box">
+
+                <span>AI Confidence</span>
+
+                <strong>
+                    {{ confidence }}%
+                </strong>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span>Health Score</span>
+
+                <strong>
+                    {{ health_score }}/100
+                </strong>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span>Stroke Probability</span>
+
+                <strong>
+                    {{ stroke_probability }}%
+                </strong>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <span>Risk Forecast</span>
+
+                <strong>
+                    {{ risk }}
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- EXPLANATION -->
+
+        <div class="explanation-card">
+
+            <h3>✦ AI Explanation</h3>
+
+            <p>
+                {{ explanation }}
+            </p>
+
+
+            {% if explanation_data %}
+
+            <div class="explanation-table">
+
+                {% for factor, value in explanation_data.items() %}
+
+                <div class="factor-row">
+
+                    <span>
+                        {{ factor }}
+                    </span>
+
+                    <strong>
+                        {{ value }}%
+                    </strong>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- RECOMMENDATION -->
+
+        <div class="tips-card">
+
+            <h3>💡 AI Recommendation</h3>
+
+            <p>
+                {{ tips }}
+            </p>
+
+        </div>
+
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History{% endblock %}
+
+{% block css %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/history.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="history-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="history-header">
+
+        <div>
+
+            <span class="page-label">
+                AI HEALTH RECORDS
+            </span>
+
+            <h1>
+                Prediction History
+            </h1>
+
+            <p>
+                Review your previous AI health assessments.
+            </p>
+
+        </div>
+
+        <div class="history-count">
+
+            <strong>
+                {{ records|length }}
+            </strong>
+
+            <span>
+                Records
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         HISTORY CARD
+    ====================================================== -->
+
+    <div class="history-card">
+
+        <div class="table-header">
+
+            <div>
+
+                <h2>
+                    Health Assessments
+                </h2>
+
+                <p>
+                    Previous XGBoost prediction results
+                </p>
+
+            </div>
+
+            <div class="live-status">
+
+                <span></span>
+
+                DATA SAVED
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             RECORDS AVAILABLE
+        ================================================== -->
+
+        {% if records %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Age
+                        </th>
+
+                        <th>
+                            Heart Rate
+                        </th>
+
+                        <th>
+                            SpO₂
+                        </th>
+
+                        <th>
+                            SBP
+                        </th>
+
+                        <th>
+                            DBP
+                        </th>
+
+                        <th>
+                            Glucose
+                        </th>
+
+                        <th>
+                            BMI
+                        </th>
+
+                        <th>
+                            Steps
+                        </th>
+
+                        <th>
+                            Result
+                        </th>
+
+                        <th>
+                            Confidence
+                        </th>
+
+                        <th>
+                            Stroke Probability
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for record in records %}
+
+                    <tr>
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            {% if record.created_at %}
+
+                                {{ record.created_at.strftime("%d %b %Y") }}
+
+                                <small>
+                                    {{ record.created_at.strftime("%I:%M %p") }}
+                                </small>
+
+                            {% else %}
+
+                                --
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- AGE -->
+
+                        <td>
+
+                            {{ record.age
+                               if record.age is not none
+                               else "--" }}
+
+                        </td>
+
+
+                        <!-- HEART RATE -->
+
+                        <td>
+
+                            {% if record.heart_rate is not none %}
+
+                                <span class="metric heart">
+                                    ♥ {{ record.heart_rate }}
+                                </span>
+
+                                <small>
+                                    BPM
+                                </small>
+
+                            {% else %}
+
+                                --
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- SPO2 -->
+
+                        <td>
+
+                            {% if record.spo2 is not none %}
+
+                                <span class="metric oxygen">
+                                    {{ record.spo2 }}%
+                                </span>
+
+                            {% else %}
+
+                                --
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- SBP -->
+
+                        <td>
+
+                            {{ record.sbp
+                               if record.sbp is not none
+                               else "--" }}
+
+                        </td>
+
+
+                        <!-- DBP -->
+
+                        <td>
+
+                            {{ record.dbp
+                               if record.dbp is not none
+                               else "--" }}
+
+                        </td>
+
+
+                        <!-- GLUCOSE -->
+
+                        <td>
+
+                            {{ record.glucose
+                               if record.glucose is not none
+                               else "--" }}
+
+                        </td>
+
+
+                        <!-- BMI -->
+
+                        <td>
+
+                            {{ record.bmi
+                               if record.bmi is not none
+                               else "--" }}
+
+                        </td>
+
+
+                        <!-- STEPS -->
+
+                        <td>
+
+                            {{ record.steps
+                               if record.steps is not none
+                               else "--" }}
+
+                        </td>
+
+
+                        <!-- RESULT -->
+
+                        <td>
+
+                            {% if record.prediction and
+                                  "High" in record.prediction %}
+
+                                <span class="result high">
+                                    ⚠ High Risk
+                                </span>
+
+                            {% elif record.prediction %}
+
+                                <span class="result low">
+                                    ✓ Low Risk
+                                </span>
+
+                            {% else %}
+
+                                <span class="result">
+                                    No Prediction
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- CONFIDENCE -->
+
+                        <td>
+
+                            {% if record.confidence is not none %}
+
+                                <span class="confidence">
+
+                                    {{ "%.2f"|format(
+                                        record.confidence
+                                    ) }}%
+
+                                </span>
+
+                            {% else %}
+
+                                --
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- STROKE PROBABILITY -->
+
+                        <td>
+
+                            {% if record.stroke_probability is not none %}
+
+                                <span class="probability">
+
+                                    {{ "%.2f"|format(
+                                        record.stroke_probability
+                                    ) }}%
+
+                                </span>
+
+                            {% else %}
+
+                                --
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =================================================
+             INFORMATION
+        ================================================== -->
+
+        <div class="history-info">
+
+            <span>
+                ●
+            </span>
+
+            <p>
+                New predictions generated from your wearable
+                health data are automatically saved here.
+            </p>
+
+        </div>
+
+
+        {% else %}
+
+
+        <!-- =================================================
+             EMPTY STATE
+        ================================================== -->
+
+        <div class="empty-history">
+
+            <div class="empty-icon">
+                🕘
+            </div>
+
+            <h2>
+                No Prediction History
+            </h2>
+
+            <p>
+                Your completed health predictions will appear here.
+            </p>
+
+            <a href="{{ url_for('prediction.prediction') }}">
+
+                Make Your First Prediction →
+
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
