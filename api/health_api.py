@@ -39,23 +39,43 @@ def sync_health():
         # ==========================================================
         # 2. GET USER
         # ==========================================================
-
         user_id = data.get("user_id")
 
-        if not user_id:
+        # DEBUG: Check the ID received from Android
+        print("\n========== USER ID DEBUG ==========")
+        print("Received user_id:", repr(user_id))
+        print(
+            "Users in this database:",
+            [(u.id, u.fullname) for u in User.query.all()]
+        )
+        print("===================================\n")
+
+        if user_id is None or str(user_id).strip() == "":
             return jsonify({
                 "status": "error",
                 "message": "user_id is required"
             }), 400
 
-
-        user = User.query.get(user_id)
-
-        if user is None:
+        try:
+            user_id = int(user_id)
+        except (TypeError, ValueError):
             return jsonify({
                 "status": "error",
-                "message": "User not found"
+                "message": "user_id must be a valid integer"
+            }), 400
+
+        user = db.session.get(User, user_id)
+
+        if user is None:
+            print("DEBUG: User ID does not exist:", user_id)
+
+            return jsonify({
+                "status": "error",
+                "message": "User not found",
+                "received_user_id": user_id
             }), 404
+
+        print("DEBUG: Matched user:", user.id, user.fullname)
 
 
         # ==========================================================
